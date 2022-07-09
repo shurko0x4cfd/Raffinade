@@ -8,7 +8,7 @@
   // Unstable !
 
 // Constants
-var FIRST, ONE, ONLY, SECOND, arr, asyncrange3, azip, azip2, cl, first, generator, is_arr, last, len, lswap, many_to_one, map, mapk, max, min, min2, min3, only, pack, penultimate, pick, pkone, rswap, second, split, swap, times, u,
+var EXIT_OK, FIRST, LEFT, ONE, ONLY, RIGHT, SECOND, TWO, all_beats_one, alto, apply_to_all, arr, asyncrange3, ato, azip, azip2, cc, cl, concat, constr, cps, cps2, empty, ensure, first, gen, generator, is_arr, last, len, lswap, map, mapk, max, min, min2, min3, only, pack, penultimate, pick, pk, pkone, predec, prodec, pu, rswap, second, split, swap, times, u,
   splice = [].splice;
 
 ONLY = 0;
@@ -19,7 +19,15 @@ SECOND = 1;
 
 ONE = 1;
 
+TWO = 2;
+
+LEFT = 0;
+
+RIGHT = 1;
+
 u = void 0;
+
+EXIT_OK = 0;
 
 // Shortcuts
 cl = console.log;
@@ -27,6 +35,18 @@ cl = console.log;
 arr = Array.from;
 
 is_arr = Array.isArray;
+
+len = function(arr) {
+  return arr.length;
+};
+
+split = function(sep, str) {
+  return str.split(sep);
+};
+
+map = function(f, arr) {
+  return arr.map(f);
+};
 
 // Prefix part
 lswap = swap = function(l, r, ...yarg) {
@@ -39,17 +59,36 @@ rswap = function(...yarg) {
   return [...yarg, r, l];
 };
 
+empty = function(arrg) {
+  return !len(arrg);
+};
+
 // pick = (idx, arr) -> arr[idx]
 pick = function(idx, arr) {
   return arr.at(idx);
 };
 
-pack = function(...args) {
+pack = pk = function(...args) {
   return args;
 };
 
-pkone = function(ent) {
-  return [ent];
+pkone = function(entt) {
+  return pack(entt);
+};
+
+ensure = {};
+
+ensure.array = ensure.list = function(any) {
+  if (is_arr(any)) {
+    return any;
+  } else {
+    return pack(any);
+  }
+};
+
+concat = cc = function(arrg, ...entts) {
+  arrg = ensure.array(arrg);
+  return arrg.concat(entts);
 };
 
 times = function(times, opr, opd) {
@@ -60,23 +99,76 @@ times = function(times, opr, opd) {
   return opd;
 };
 
-many_to_one = function(val, fcs) {
+// Functional-like construction
+all_beats_one = constr = function(val, fcs) {
   fcs.map(function(fc) {
     return val = fc(val);
   });
   return val;
 };
 
-map = function(f, arr) {
-  return arr.map(f);
+// Functional-like apply-to-all
+apply_to_all = ato = function(fcs, vals) {
+  [fcs, vals] = [fcs, vals].map(ensure.array);
+  return vals.map(function(val) {
+    fcs.forEach(function(fc) {
+      return val = fc(val);
+    });
+    return val;
+  });
+};
+
+// Alternative ato
+alto = function(fcs, vals) {
+  [fcs, vals] = [fcs, vals].map(ensure.array);
+  return vals.map(function(val) {
+    var fseq;
+    fseq = [val].concat(fcs); // Rewrite to fseq = cc val, fcs
+    return fseq.reduce(function(acc, fc) {
+      return fc(acc);
+    });
+  });
+};
+
+// Functional-like composition
+cps2 = function(fc1, fc2) {
+  return function(any) {
+    return fc1(fc2(any));
+  };
+};
+
+// General functional-like composition
+cps = function(...fcs) {
+  fcs = fcs.reverse(u);
+  return function(any) {
+    return alto(fcs, any);
+  };
+};
+
+// Naive Descartes production
+predec = function(fc, arrs, defined) {
+  var itentt, rest;
+  if (empty(arrs)) {
+    return fc(defined);
+  } else {
+    rest = arr(arrs);
+    itentt = rest.shift(u);
+    return itentt.forEach(function(itentr) {
+      return predec(fc, rest, cc(defined, itentr));
+    });
+  }
+};
+
+prodec = function(fc, ...arrs) {
+  return predec(fc, arrs, []);
 };
 
 mapk = function(f, ...args) {
   return args.map(f);
 };
 
-first = only = function(arr) {
-  return arr[FIRST];
+first = only = function(arrg) {
+  return arrg[FIRST];
 };
 
 second = function(arr) {
@@ -87,16 +179,8 @@ last = function(arr) {
   return arr[arr.length - 1];
 };
 
-penultimate = function(arr) {
+penultimate = pu = function(arr) {
   return arr[arr.length - 2];
-};
-
-len = function(arr) {
-  return arr.length;
-};
-
-split = function(sep, str) {
-  return str.split(sep);
 };
 
 min = function(one, another) {
@@ -112,12 +196,12 @@ max = function(one, another) {
 };
 
 // Wrap array to generator
-generator = async function*(arr) {
+generator = gen = async function*(arr) {
   var i;
   for await (i of arr) {
     yield i;
   }
-  return u;
+  return void 0;
 };
 
 // Async range, 3 dot
@@ -130,7 +214,7 @@ asyncrange3 = function*(start, end) {
   for (n = j = ref = start, ref1 = end; (ref <= ref1 ? j < ref1 : j > ref1); n = ref <= ref1 ? ++j : --j) {
     yield n;
   }
-  return u;
+  return void 0;
 };
 
 
@@ -141,7 +225,7 @@ azip2 = async function*(l, r) {
   for await (i of ref) {
     yield pack(l[i], r[i]);
   }
-  return u;
+  return void 0;
 };
 
 // General asinc zip for several arrays, but only up to shortest array
@@ -175,7 +259,7 @@ azip = async function*(...args) {
     }
     yield result;
   }
-  return u;
+  return void 0;
 };
 
 // Drafts
@@ -198,22 +282,34 @@ export {
   u,
   cl,
   arr,
+  concat,
+  cc,
   swap,
   lswap,
   rswap,
   pick,
   pack,
   pkone,
+  ensure,
   times,
-  many_to_one,
+  all_beats_one,
+  constr,
+  apply_to_all,
+  ato,
+  alto,
+  cps2,
+  cps,
+  prodec,
   map,
   mapk,
   first,
   second,
   last,
   penultimate,
+  pu,
   split,
   generator,
+  gen,
   asyncrange3,
   azip2,
   azip,

@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "raffinade",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Goodies for CoffeeScript",
   "main": "JS/raffinade.js",
   "scripts": {

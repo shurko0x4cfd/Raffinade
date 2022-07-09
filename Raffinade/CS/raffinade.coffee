@@ -17,7 +17,12 @@ ONLY = 0
 FIRST = 0
 SECOND = 1
 ONE = 1
+TWO = 2
+LEFT = 0
+RIGHT = 1
 u = undefined
+
+EXIT_OK = 0
 
 
 # Shortcuts
@@ -25,6 +30,9 @@ u = undefined
 cl = console .log
 arr = Array .from
 is_arr = Array .isArray
+len = (arr) -> arr .length
+split = (sep, str) -> str .split sep
+map = (f, arr) -> arr .map f
 
 
 # Prefix part
@@ -32,11 +40,27 @@ is_arr = Array .isArray
 lswap = swap = (l, r, ...yarg) -> [r, l, ...yarg]
 rswap = (...yarg, l, r) -> [...yarg, r, l]
 
+empty = (arrg) -> not len arrg
+
 # pick = (idx, arr) -> arr[idx]
 pick = (idx, arr) -> arr .at idx
 
-pack = (...args) -> args
-pkone = (ent) -> [ent]
+pack = pk = (...args) -> args
+pkone = (entt) -> pack entt
+
+
+ensure = {}
+
+ensure .array = ensure .list = (any) ->
+	if is_arr any
+		any
+	else
+		pack any
+
+
+concat = cc =  (arrg, ...entts) ->
+	arrg = ensure .array arrg
+	arrg .concat entts
 
 
 times = (times, opr, opd) ->
@@ -44,33 +68,75 @@ times = (times, opr, opd) ->
 	opd
 
 
-many_to_one = (val, fcs) ->
+# Functional-like construction
+all_beats_one = constr = (val, fcs) ->
 	fcs .map (fc) -> val = fc val
 	val
 
 
-map = (f, arr) -> arr .map f
+# Functional-like apply-to-all
+apply_to_all = ato = (fcs, vals) ->
+	[fcs, vals] = [fcs, vals] .map ensure .array
+	
+	vals .map (val) ->
+		fcs .forEach (fc) -> val = fc val
+		val
+
+
+# Alternative ato
+alto = (fcs, vals) ->
+	[fcs, vals] = [fcs, vals] .map ensure .array
+	
+	vals .map (val) ->
+		fseq = [val] .concat fcs # Rewrite to fseq = cc val, fcs
+		fseq .reduce (acc, fc) -> fc acc
+
+
+# Functional-like composition
+cps2 = (fc1, fc2) -> (any) -> fc1 fc2 any
+
+
+# General functional-like composition
+cps = (...fcs) -> 
+	fcs = fcs .reverse u
+	(any) -> alto fcs, any
+
+
+# Naive Descartes production
+predec = (fc, arrs, defined) ->
+	if empty arrs
+		fc defined
+
+	else
+		rest = arr arrs
+		itentt = rest .shift u
+
+		itentt .forEach (itentr) ->
+			predec fc, rest, cc defined, itentr
+
+prodec = (fc, ...arrs) ->
+	predec fc, arrs, []
+
+
+
 mapk = (f, ...args) -> args .map f
 
 
-first = only = (arr) -> arr[FIRST]
+first = only = (arrg) -> arrg[FIRST] # Rewrite to arrg .at FIRST
 
 second = (arr) -> arr[SECOND]
 
 last = (arr) -> arr[arr .length - 1]
-penultimate = (arr) -> arr[arr .length - 2]
-
-len = (arr) -> arr .length
-split = (sep, str) -> str .split sep
+penultimate = pu = (arr) -> arr[arr .length - 2]
 
 min = (one, another) -> if one < another then one else another
 max = (one, another) -> min another, one
 
 
 # Wrap array to generator
-generator = (arr) ->
+generator = gen = (arr) ->
 	yield i for await i from arr
-	u
+	undefined
 
 
 # Async range, 3 dot
@@ -79,13 +145,13 @@ asyncrange3 = (start, end) ->
 		yield start
 		return
 	yield n for n in [start...end]
-	u
+	undefined
  
 
 # Easy async zip for only two arrays
 azip2 = (l, r) ->
 	yield pack l[i], r[i] for await i from asyncrange3 0, min l .length, r .length
-	u
+	undefined
 
 
 # General asinc zip for several arrays, but only up to shortest array
@@ -118,7 +184,7 @@ azip = (...args) ->
 			break
 
 		yield result
-	u
+	undefined
 
 
 
@@ -135,27 +201,36 @@ min3 = (...args) ->
 export \
 	{
 		ONLY,
-		FIRST,
-		SECOND,
+		FIRST, SECOND,
+		ONE, TWO,
+		LEFT, RIGHT,
+		EXIT_OK,
 		u,
 		cl,
 		arr,
+		len,
+		concat, cc,
 		swap,
 		lswap,
 		rswap,
+		empty,
 		pick,
 		pack,
 		pkone,
+		ensure,
 		times,
-		many_to_one,
+		all_beats_one, constr,
+		apply_to_all, ato, alto,
+		cps2, cps,
+		prodec,
 		map,
 		mapk,
 		first,
 		second,
 		last,
-		penultimate,
+		penultimate, pu,
 		split,
-		generator,
+		generator, gen,
 		asyncrange3,
 		azip2,
 		azip,
