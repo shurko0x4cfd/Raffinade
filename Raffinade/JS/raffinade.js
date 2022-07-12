@@ -8,7 +8,7 @@
   // Unstable !
 
 // Constants
-var EXIT_OK, FIRST, LEFT, ONE, ONLY, RIGHT, SECOND, TWO, all_beats_one, alto, apply_to_all, arr, asyncrange3, ato, azip, azip2, cc, cl, concat, constr, cps, cps2, empty, ensure, first, gen, generator, is_arr, last, len, lswap, map, mapk, max, min, min2, min3, only, pack, penultimate, pick, pk, pkone, predec, prodec, pu, rswap, second, split, swap, times, u,
+var EXIT_OK, FIRST, LAST, LEFT, NONE, ONE, ONLY, PENULTIMATE, RIGHT, SECOND, TWO, all_beats_one, alto, apply_to_all, apredec, aprodec, arr, asyncrange3, ato, azip, azip2, cc, cl, concat, constr, cps, cps2, empty, ensure, first, gen, generator, is_arr, join, last, len, lswap, map, mapk, max, min, min2, min3, noop, only, pack, penultimate, pick, pk, pkone, predec, prodec, pu, rswap, second, split, swap, times, u,
   splice = [].splice;
 
 ONLY = 0;
@@ -17,6 +17,10 @@ FIRST = 0;
 
 SECOND = 1;
 
+LAST = -1;
+
+PENULTIMATE = -2;
+
 ONE = 1;
 
 TWO = 2;
@@ -24,6 +28,8 @@ TWO = 2;
 LEFT = 0;
 
 RIGHT = 1;
+
+NONE = 0;
 
 u = void 0;
 
@@ -46,6 +52,10 @@ split = function(sep, str) {
 
 map = function(f, arr) {
   return arr.map(f);
+};
+
+join = function(s, a) {
+  return a.join(s);
 };
 
 // Prefix part
@@ -163,6 +173,27 @@ prodec = function(fc, ...arrs) {
   return predec(fc, arrs, []);
 };
 
+// Naive async Descartes production
+apredec = function*(fc, arrs, defined) {
+  var itentr, itentt, j, len1, rest;
+  if (empty(arrs)) {
+    yield fc(defined);
+  } else {
+    rest = arr(arrs);
+    itentt = rest.shift(u);
+    for (j = 0, len1 = itentt.length; j < len1; j++) {
+      itentr = itentt[j];
+      yield* apredec(fc, rest, cc(defined, itentr));
+    }
+  }
+  return void 0;
+};
+
+aprodec = function*(fc = noop, ...arrs) {
+  yield* apredec(fc, arrs, []);
+  return void 0;
+};
+
 mapk = function(f, ...args) {
   return args.map(f);
 };
@@ -229,11 +260,11 @@ azip2 = async function*(l, r) {
 };
 
 // General asinc zip for several arrays, but only up to shortest array
-azip = async function*(...args) {
+azip = async function*(...arrgs) {
   var arg, entry, j, len1, result, wrapped;
   wrapped = [];
-  for (j = 0, len1 = args.length; j < len1; j++) {
-    arg = args[j];
+  for (j = 0, len1 = arrgs.length; j < len1; j++) {
+    arg = arrgs[j];
     if (is_arr(arg)) {
       arg = generator(arg);
     }
@@ -262,6 +293,11 @@ azip = async function*(...args) {
   return void 0;
 };
 
+// Do nothing. Just reurn self one argument
+noop = function(arg) {
+  return arg;
+};
+
 // Drafts
 min2 = function(...args) {
   return min(...first(args));
@@ -279,14 +315,26 @@ export {
   ONLY,
   FIRST,
   SECOND,
+  ONE,
+  TWO,
+  LEFT,
+  RIGHT,
+  LAST,
+  PENULTIMATE,
+  NONE,
+  EXIT_OK,
   u,
   cl,
   arr,
+  len,
+  join,
   concat,
   cc,
+  noop,
   swap,
   lswap,
   rswap,
+  empty,
   pick,
   pack,
   pkone,
@@ -300,6 +348,7 @@ export {
   cps2,
   cps,
   prodec,
+  aprodec,
   map,
   mapk,
   first,

@@ -16,10 +16,13 @@
 ONLY = 0
 FIRST = 0
 SECOND = 1
+LAST = -1
+PENULTIMATE = -2
 ONE = 1
 TWO = 2
 LEFT = 0
 RIGHT = 1
+NONE = 0
 u = undefined
 
 EXIT_OK = 0
@@ -33,6 +36,7 @@ is_arr = Array .isArray
 len = (arr) -> arr .length
 split = (sep, str) -> str .split sep
 map = (f, arr) -> arr .map f
+join = (s, a) -> a .join s
 
 
 # Prefix part
@@ -118,6 +122,26 @@ prodec = (fc, ...arrs) ->
 	predec fc, arrs, []
 
 
+# Naive async Descartes production
+apredec = (fc, arrs, defined) ->
+
+	if empty arrs
+		yield fc defined
+
+	else
+		rest = arr arrs
+		itentt = rest .shift u
+
+		for itentr in itentt
+			yield from apredec fc, rest, cc defined, itentr
+
+	undefined
+
+aprodec = (fc = noop, ...arrs) ->
+	yield from apredec fc, arrs, []
+	undefined
+
+
 
 mapk = (f, ...args) -> args .map f
 
@@ -155,10 +179,10 @@ azip2 = (l, r) ->
 
 
 # General asinc zip for several arrays, but only up to shortest array
-azip = (...args) ->
+azip = (...arrgs) ->
 	wrapped = []
 
-	for arg in args
+	for arg in arrgs
 		if is_arr arg
 			arg = generator arg
 
@@ -187,6 +211,9 @@ azip = (...args) ->
 	undefined
 
 
+# Do nothing. Just reurn self one argument
+noop = (arg) -> arg
+
 
 
 # Drafts
@@ -204,12 +231,16 @@ export \
 		FIRST, SECOND,
 		ONE, TWO,
 		LEFT, RIGHT,
+		LAST, PENULTIMATE,
+		NONE,
 		EXIT_OK,
 		u,
 		cl,
 		arr,
 		len,
+		join,
 		concat, cc,
+		noop,
 		swap,
 		lswap,
 		rswap,
@@ -222,7 +253,7 @@ export \
 		all_beats_one, constr,
 		apply_to_all, ato, alto,
 		cps2, cps,
-		prodec,
+		prodec, aprodec,
 		map,
 		mapk,
 		first,
