@@ -18,6 +18,7 @@ FIRST = 0
 SECOND = 1
 LAST = -1
 PENULTIMATE = -2
+NULL = 0
 ONE = 1
 TWO = 2
 LEFT = 0
@@ -51,6 +52,16 @@ empty = (arrg) -> not len arrg
 # pick = (idx, arr) -> arr[idx]
 pick = (idx, arr) -> arr .at idx
 
+
+# Deletion by index
+indelone = (idx, arrg) ->
+	if is_arr arrg
+		delete arrg[idx]
+
+indel = (idx, ...arrgs) ->
+	arrgs .forEach indelone .bind null, idx
+
+
 pack = pk = (...args) -> args
 pkone = (entt) -> pack entt
 
@@ -67,6 +78,10 @@ ensure .array = ensure .list = (any) ->
 concat = cc =  (arrg, ...entts) ->
 	arrg = ensure .array arrg
 	arrg .concat entts
+
+
+# Just discard empty slots in JS array
+refusempty = (arrg) -> arrg .filter (itm) -> itm
 
 
 times = (times, opr, opd) ->
@@ -125,6 +140,9 @@ prodec = (fc, ...arrs) ->
 
 
 # Naive async Descartes production
+# Only first argument in arrs can be an ogject-generator sience first argument
+# iterated once and hence need not second using, which is impossible sience is
+# not an iterator and we hence has no perfect way to recreate it
 apredec = (fc, arrs, defined) ->
 
 	if empty arrs
@@ -138,12 +156,12 @@ apredec = (fc, arrs, defined) ->
 			itentt = gen itentt
 
 		for await itentr from itentt
-			yield from (i for await i from apredec fc, rest, cc defined, itentr)
+			yield i for await i from apredec fc, rest, cc defined, itentr
 
 	undefined
 
 aprodec = (fc = noop, ...arrs) ->
-	yield (i for await i from apredec fc, arrs, [])
+	yield i for await i from apredec fc, arrs, []
 	undefined
 
 
@@ -183,7 +201,7 @@ asyncrange3 = (start, end) ->
 		return
 	yield n for n in [start...end]
 	undefined
- 
+
 
 # Easy async zip for only two arrays
 azip2 = (l, r) ->
@@ -192,40 +210,56 @@ azip2 = (l, r) ->
 
 
 # General asinc zip for several arrays, but only up to shortest array
+
 azip = (...arrgs) ->
-	wrapped = []
 
-	for arg in arrgs
-		if is_arr arg
-			arg = generator arg
+	generators = arrgs .map (ent) ->
 
-		if typeof arg  == 'function'
-			arg = arg u
+		if ent .next
+			return ent
 
-		wrapped .push arg
+		if ent[Symbol.iterator]
+			return ent[Symbol.iterator] u
 
-	entry = done: false
+		return gen pkone ent
 
-	while not entry .done
-		result = []
+	while true
+		array = (gtr .next u for gtr from generators)
 
-		for await generator from wrapped
-			entry  = await generator .next u
+		if array .find (entry) -> entry .done
+			return
+			
+		yield array .map (entry) -> entry .value
+	undefined
+		
 
-			if entry .done
-				break
+# Yields natural numbers
+naturange = (c = ONE) ->
+	while c >= 0
+		yield c++
+	undefined
 
-			result .push entry .value
-
-		if entry .done
-			break
-
-		yield result
+	
+# Async Python-like enumerate ()
+enumerate = (iterable, start_with = NULL) ->
+	yield i for i from azip iterable, naturange start_with
 	undefined
 
 
-# Do nothing. Just reurn self one argument
-noop = (arg) -> arg
+# Named enumerate
+enamerate = (iterable, entry_name = 'val', index_name = 'idx', start_with = NULL) ->
+
+	names = pack entry_name, index_name
+	pairs = enumerate iterable, start_with
+
+	for pair from pairs
+		yield Object .fromEntries azip names, pair
+
+	undefined
+
+
+# Do nothing. Just returns undefined
+noop = () -> u
 
 
 
@@ -242,7 +276,7 @@ export \
 	{
 		ONLY,
 		FIRST, SECOND,
-		ONE, TWO,
+		NULL, ONE, TWO,
 		LEFT, RIGHT,
 		LAST, PENULTIMATE,
 		NONE, NOENT,
@@ -253,6 +287,9 @@ export \
 		len,
 		join,
 		concat, cc,
+		refusempty,
+		naturange,
+		enumerate, enamerate,
 		noop,
 		swap,
 		lswap,
@@ -281,5 +318,6 @@ export \
 		max,
 		min,
 		min2,
-		min3
+		min3,
+		indelone, indel
 	}
