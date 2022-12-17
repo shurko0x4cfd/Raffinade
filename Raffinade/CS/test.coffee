@@ -1,8 +1,8 @@
 
-import { u, cl, arr, aprodec, join, gen, azip, asyncrange3, enumerate, naturange, enamerate } from './raffinade.js'
+import { u, cl, aprodec, join } from './raffinade.js'
 
 
-arr0 = () ->
+arr0 = ->
     yield from [1, 2]
 
 arr0 = arr0 u

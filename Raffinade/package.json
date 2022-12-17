@@ -1,21 +1,20 @@
 {
-  "type": "module",
-  "name": "raffinade",
-  "version": "0.0.15",
-  "description": "Goodies for CoffeeScript",
-  "main": "JS/raffinade.js",
-  "scripts": {
-    "recompile-all": "coffee --bare --no-header -co JS/ CS/",
-    "test": "echo \"No test specified\" && exit 1"
-  },
-  "keywords": [
-    "CoffeeScript",
-    "prefix",
-    "postfix"
-  ],
-  "author": "Alexander (Shurko) Stadnichenko",
-  "license": "BSD-2-Clause",
-  "devDependencies": {
-    "coffeescript": ">=2.7.0"
-  }
+	"type": "module",
+	"name": "raffinade",
+	"version": "0.0.16",
+	"description": "Goodies for CoffeeScript",
+	"main": "JS/raffinade.js",
+	"scripts": {
+		"recompile-all": "coffee --bare --no-header -co JS/ CS/"
+	},
+	"keywords": [
+		"CoffeeScript",
+		"prefix"
+	],
+	"author": "Alexander (Shurko) Stadnichenko",
+	"license": "BSD-2-Clause",
+	"devDependencies": {
+		"coffeescript": ">=2.7.0",
+		"flow-bin": "^0.196.0"
+	}
 }

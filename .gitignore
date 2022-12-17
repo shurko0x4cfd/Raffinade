@@ -1,2 +1,9 @@
 
-Raffinade/JS/test.js
+**/node_modules
+**/JS/test.js
+
+logs
+*.log
+tmp
+*.tmp
+*.old

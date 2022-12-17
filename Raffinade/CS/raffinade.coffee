@@ -21,7 +21,7 @@ ONE		= 1
 TWO		= 2
 LEFT	= 0
 RIGHT	= 1
-u	= undefined
+u = undefined
 
 EXIT_OK = 0
 
@@ -37,6 +37,8 @@ map = (f, arr) -> arr .map f
 join = (s, a) -> a .join s
 min = (arrg) -> Math .min ...arrg
 max = (arrg) -> Math .max ...arrg
+bind = (ctx, ...args, fn) -> fn .bind ctx, ...args
+nbind = (...args, fn) -> fn .bind null, ...args
 
 
 # Do nothing. Just returns undefined
@@ -55,6 +57,11 @@ gp = (key, obj) -> obj[key]
 
 ### Set property ###
 sp = (key, val, obj) -> obj[key] = val
+
+
+# Move first argument of function to end of its arguments
+export roll = (fn, ...not_callable_args, callable_arg) ->
+	fn callable_arg, ...not_callable_args
 
 
 # Deletion by index
@@ -246,8 +253,8 @@ naturange = (c = ONE) ->
 
 	
 # Async Python-like enumerate ()
-enumerate = (iterable, start_with = NULL) ->
-	yield i for i from azip iterable, naturange start_with
+enumerate = (iterable, starts_with = NULL) ->
+	yield i for i from azip iterable, naturange starts_with
 	undefined
 
 
@@ -276,6 +283,7 @@ export \
 		arr, is_arr,
 		len,
 		join,
+		bind, nbind,
 		extend, concarr, cc,
 		refusempty,
 		naturange,

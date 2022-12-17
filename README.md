@@ -40,5 +40,3 @@ v = -> undefined # Kind of JS void
 
 some_function = -> v some_code
 ```
-
-
