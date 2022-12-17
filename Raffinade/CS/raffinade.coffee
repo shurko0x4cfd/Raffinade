@@ -9,24 +9,19 @@
 # Unstable !
 
 
-
-
 # Constants
 
-ONLY = 0
-FIRST = 0
-SECOND = 1
-LAST = -1
+ONLY	= 0
+FIRST	= 0
+SECOND	= 1
+LAST	= -1
 PENULTIMATE = -2
-NULL = 0
-ONE = 1
-TWO = 2
-LEFT = 0
-RIGHT = 1
-u = undefined
-
-NONE = '}9{9Pd^T'
-NOENT = 'Yr4-*<c{'
+NULL	= 0
+ONE		= 1
+TWO		= 2
+LEFT	= 0
+RIGHT	= 1
+u	= undefined
 
 EXIT_OK = 0
 
@@ -40,17 +35,26 @@ len = (arr) -> arr .length
 split = (sep, str) -> str .split sep
 map = (f, arr) -> arr .map f
 join = (s, a) -> a .join s
+min = (arrg) -> Math .min ...arrg
+max = (arrg) -> Math .max ...arrg
 
 
-# Prefix part
+# Do nothing. Just returns undefined
+noop = v = -> u
+
 
 lswap = swap = (l, r, ...yarg) -> [r, l, ...yarg]
 rswap = (...yarg, l, r) -> [...yarg, r, l]
 
 empty = (arrg) -> not len arrg
 
-# pick = (idx, arr) -> arr[idx]
-pick = (idx, arr) -> arr .at idx
+at = (idx, arr) -> arr .at idx
+
+### Get property ###
+gp = (key, obj) -> obj[key]
+
+### Set property ###
+sp = (key, val, obj) -> obj[key] = val
 
 
 # Deletion by index
@@ -58,12 +62,12 @@ indelone = (idx, arrg) ->
 	if is_arr arrg
 		delete arrg[idx]
 
+	
 indel = (idx, ...arrgs) ->
 	arrgs .forEach indelone .bind null, idx
 
 
 pack = pk = (...args) -> args
-pkone = (entt) -> pack entt
 
 
 ensure = {}
@@ -75,9 +79,13 @@ ensure .array = ensure .list = (any) ->
 		pack any
 
 
-concat = cc =  (arrg, ...entts) ->
+extend =  (arrg, ...entts) ->
 	arrg = ensure .array arrg
 	arrg .concat entts
+
+
+concarr = cc =  (...arrgs) ->
+	arrgs .reduce (acc, arr) -> pack ...acc, ...arr
 
 
 # Just discard empty slots in JS array
@@ -133,7 +141,7 @@ predec = (fc, arrs, defined) ->
 		itentt = rest .shift u
 
 		itentt .forEach (itentr) ->
-			predec fc, rest, cc defined, itentr
+			predec fc, rest, extend defined, itentr
 
 prodec = (fc, ...arrs) ->
 	predec fc, arrs, []
@@ -156,7 +164,7 @@ apredec = (fc, arrs, defined) ->
 			itentt = gen itentt
 
 		for await itentr from itentt
-			yield i for await i from apredec fc, rest, cc defined, itentr
+			yield i for await i from apredec fc, rest, extend defined, itentr
 
 	undefined
 
@@ -165,33 +173,30 @@ aprodec = (fc = noop, ...arrs) ->
 	undefined
 
 
-
 mapk = (f, ...args) -> args .map f
 
+first = only = (arrg) -> arrg .at FIRST
 
-first = only = (arrg) -> arrg[FIRST] # Rewrite to arrg .at FIRST
+second = (arrg) -> arrg .at SECOND
 
-second = (arr) -> arr[SECOND] # Rewrite to arrg .at SECOND
-###
-# return entity/entry if any, else custom or default no entry/no entity marker
-second = (arrg, noent = NOENT) ->
-	if len arrg > ONE
-		arr .at SECOND
-	else
-		noent
-###
 
-last = (arr) -> arr[arr .length - 1] # Rewrite to arrg .at LAST
-penultimate = pu = (arr) -> arr[arr .length - 2] # Rewrite to arrg .at PENULTIMATE
-
-min = (one, another) -> if one < another then one else another
-max = (one, another) -> min another, one
+last = (arrg) -> arrg .at LAST
+penultimate = pu = (arrg) -> arrg .at PENULTIMATE
 
 
 # Wrap array to generator
 generator = gen = (arr) ->
 	yield i for await i from arr
 	undefined
+
+
+# Wrap array to destructive generator
+### degenerator = deger = (arrg) ->
+	cnt = len arrg
+
+	while 0 < cnt--
+		yield arrg .shift u
+	undefined ###
 
 
 # Async range, 3 dot
@@ -221,7 +226,7 @@ azip = (...arrgs) ->
 		if ent[Symbol.iterator]
 			return ent[Symbol.iterator] u
 
-		return gen pkone ent
+		return gen pack ent
 
 	while true
 		array = (gtr .next u for gtr from generators)
@@ -247,29 +252,15 @@ enumerate = (iterable, start_with = NULL) ->
 
 
 # Named enumerate
-enamerate = (iterable, entry_name = 'val', index_name = 'idx', start_with = NULL) ->
+enamerate = (iterable, entry_name = 'val', index_name = 'idx', start_from = NULL) ->
 
 	names = pack entry_name, index_name
-	pairs = enumerate iterable, start_with
+	pairs = enumerate iterable, start_from
 
 	for pair from pairs
 		yield Object .fromEntries azip names, pair
 
 	undefined
-
-
-# Do nothing. Just returns undefined
-noop = () -> u
-
-
-
-# Drafts
-min2 = (...args) ->
-	min ...first args
-# Drafts
-min3 = (...args) ->
-	args = first args if !! args .length and is_arr first args
-	min ...args
 
 
 export \
@@ -279,25 +270,23 @@ export \
 		NULL, ONE, TWO,
 		LEFT, RIGHT,
 		LAST, PENULTIMATE,
-		NONE, NOENT,
 		EXIT_OK,
 		u,
 		cl,
-		arr,
+		arr, is_arr,
 		len,
 		join,
-		concat, cc,
+		extend, concarr, cc,
 		refusempty,
 		naturange,
 		enumerate, enamerate,
-		noop,
+		noop, v,
 		swap,
 		lswap,
 		rswap,
 		empty,
-		pick,
+		at,
 		pack,
-		pkone,
 		ensure,
 		times,
 		all_beats_one, constr,
@@ -306,7 +295,7 @@ export \
 		prodec, apredec, aprodec,
 		map,
 		mapk,
-		first,
+		first, only,
 		second,
 		last,
 		penultimate, pu,
@@ -317,7 +306,6 @@ export \
 		azip,
 		max,
 		min,
-		min2,
-		min3,
-		indelone, indel
+		indelone, indel,
+		gp, sp
 	}

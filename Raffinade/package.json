@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "raffinade",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Goodies for CoffeeScript",
   "main": "JS/raffinade.js",
   "scripts": {
@@ -16,6 +16,6 @@
   "author": "Alexander (Shurko) Stadnichenko",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "coffeescript": "^2.7.0"
+    "coffeescript": ">=2.7.0"
   }
 }
