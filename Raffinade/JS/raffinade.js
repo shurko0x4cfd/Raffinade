@@ -4,14 +4,14 @@ var apredec /*: Function */,
 	predec /*: Function */,
 	splice = [].splice;
 
-// Raffinade
+// Raffinade 0.0.18
+// Unstable !
 
-// Toolkit for improve CoffeeScript postfix and prefix ability
+// Toolkit for improve CoffeeScript prefix ability
 // in order to write and read elegant code
 
-// 2022 Alexander (Shurko) Stadnichenko
-// Under BSD-2-Clause
-// Unstable !
+// Copyright (c) 2021, 2023 Alexander (Shúrko) Stadnichénko
+// License : BSD-2-Clause
 
 // Constants
 export var ONLY /*: number */ = 0;
@@ -422,11 +422,14 @@ export var azip /*: Function */ = function* (
 };
 
 // Yields natural numbers
-export var naturange /*: Function */ = function* (c = ONE) {
-	while (c >= 0) {
+export var naturange /*: Function */ = function* (c = ONE, retval, lim = -1) {
+	if (c < 0) {
+		return retval;
+	}
+	while (lim < 0 || c <= lim) {
 		yield c++;
 	}
-	return void 0;
+	return retval;
 };
 
 // Async Python-like enumerate ()

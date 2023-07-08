@@ -1,13 +1,13 @@
 ### @flow ###
 
-# Raffinade
+# Raffinade 0.0.18
+# Unstable !
 
-# Toolkit for improve CoffeeScript postfix and prefix ability
+# Toolkit for improve CoffeeScript prefix ability
 # in order to write and read elegant code
 
-# 2022 Alexander (Shurko) Stadnichenko
-# Under BSD-2-Clause
-# Unstable !
+# Copyright (c) 2021, 2023 Alexander (Shúrko) Stadnichénko
+# License : BSD-2-Clause
 
 
 # Constants
@@ -98,7 +98,7 @@ export indelone ###: Function ### =
 	(idx ###: number ###, arrg ###: Array<any> ###) ->
 		delete arrg[idx] if is_arr arrg; u
 
-	
+
 export indel ###: Function ### =
 	(idx ###: number ### , ...arrgs ###: Array<Array<any>> ###) ->
 		arrgs .forEach indelone .bind null, idx
@@ -145,7 +145,7 @@ export constr ###: Function ### = (val, fcs) ->
 # Functional-like apply-to-all
 export ato ###: Function ### = (fcs, vals) ->
 	[fcs, vals] = [fcs, vals] .map ensure .array
-	
+
 	vals .map (val) ->
 		fcs .forEach (fc) -> val = fc val
 		val
@@ -154,7 +154,7 @@ export ato ###: Function ### = (fcs, vals) ->
 # Alternative ato
 export alto ###: Function ### = (fcs, vals) ->
 	[fcs, vals] = [fcs, vals] .map ensure .array
-	
+
 	vals .map (val) ->
 		fseq = [val] .concat fcs # Rewrite to fseq = cc val, fcs
 		fseq .reduce (acc, fc) -> fc acc
@@ -165,7 +165,7 @@ export cps2 ###: Function ### = (fc1, fc2) -> (any) -> fc1 fc2 any
 
 
 # General functional-like composition
-export cps ###: Function ### = (...fcs) -> 
+export cps ###: Function ### = (...fcs) ->
 	fcs = fcs .reverse u
 	(any) -> alto fcs, any
 
@@ -274,21 +274,24 @@ export azip ###: Function ### =
 
 			if array .find (entry) -> entry .done
 				return
-				
+
 			yield array .map (entry) -> entry .value
 		undefined
-		
+
 
 # Yields natural numbers
-export naturange ###: Function ### = (c = ONE) ->
-	while c >= 0
-		yield c++
-	undefined
+export naturange ###: Function ### = (c = ONE, retval, lim = -1) ->
+	return retval if c < 0
 
-	
+	while lim < 0 or c <= lim
+		yield c++
+
+	retval
+
+
 # Async Python-like enumerate ()
-export enumerate ###: Function ### = (iterable, starts_with = NULL) ->
-	yield i for i from azip iterable, naturange starts_with
+export enumerate ###: Function ### = (iterable, starts_from = NULL) ->
+	yield i for i from azip iterable, naturange starts_from
 	undefined
 
 
