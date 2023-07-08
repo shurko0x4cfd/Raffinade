@@ -1,7 +1,22 @@
 {
 	"name": "raffinade",
-	"version": "0.0.17",
-	"description": "Goodies for CoffeeScript",
+	"version": "0.0.18",
+	"author": "Alexander (Shúrko) Stadnichénko",
+	"license": "BSD-2-Clause",
+	"description": "Lib for CoffeeScript",
+	"keywords": [
+		"CoffeeScript",
+		"prefix"
+	],
+	"homepage": "https://github.com/shurko0x4cfd/Raffinade#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/shurko0x4cfd/Raffinade.git"
+	},
+	"bugs": {
+		"url": "https://github.com/shurko0x4cfd/Raffinade/issues",
+		"email": "shurko0x4cfd@gmail.com"
+	},
 	"type": "module",
 	"main": "JS/raffinade.js",
 	"scripts": {
@@ -9,12 +24,6 @@
 		"flow-type-check": "scripts/flow-type-check.sh",
 		"jsdoc": "node node_modules/.bin/jsdoc -c config/jsdoc.conf.json"
 	},
-	"keywords": [
-		"CoffeeScript",
-		"prefix"
-	],
-	"author": "Alexander (Shurko) Stadnichenko",
-	"license": "BSD-2-Clause",
 	"devDependencies": {
 		"coffeescript": ">=2.7.0",
 		"flow-bin": "^0.196.0",
